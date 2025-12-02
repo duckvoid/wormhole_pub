@@ -1,0 +1,118 @@
+{
+  "log": {
+    "loglevel": "debug"
+  },
+  "dns": {
+    "servers": [
+      "https+local://1.1.1.1/dns-query",
+      "localhost"
+    ]
+  },
+  "stats": {},
+  "policy": {
+    "levels": {
+      "0": {
+        "statsUserUplink": true,
+        "statsUserDownlink": true,
+        "statsInboundUplink": true,
+        "statsInboundDownlink": true
+      }
+    },
+    "system": {
+      "statsInboundUplink": true,
+      "statsInboundDownlink": true,
+      "statsOutboundUplink": true,
+      "statsOutboundDownlink": true
+    }
+  },
+  "api": {
+    "tag": "api",
+    "listen": "0.0.0.0:8080",
+    "services": [
+      "HandlerService",
+      "LoggerService",
+      "StatsService",
+      "RoutingService"
+    ]
+  },
+  "metrics": {
+    "tag": "Metrics",
+    "listen": "127.0.0.1:11111"
+  },
+  "routing": {
+    "domainStrategy": "IPIfNonMatch",
+    "rules":[
+      {
+        "type": "field",
+        "ip": [
+          "geoip:private"
+        ],
+        "outboundTag": "block"
+      },
+      {
+        "type": "field",
+        "ip": ["geoip:cn"],
+        "outboundTag": "block"
+      },
+      {
+        "type": "field",
+        "domain": [
+          "geosite:category-ads-all"
+        ],
+        "outboundTag": "block" 
+      }
+    ]
+  },
+  "inbounds": [
+    {
+      "port": 443,
+      "protocol": "vless",
+      "settings": {
+        "clients": [
+          {
+            "id": "<user1_uuid>",
+            "flow": "xtls-rprx-vision",
+            "level": 0,
+            "email": "user1@example.com"
+          },
+	  {
+            "id": "<user2_uuid>",	
+	    "flow": "xtls-rprx-vision",
+            "level": 0,
+            "email": "user2@example.com"
+          }
+        ],
+        "decryption": "none",
+        "fallbacks": [
+          {
+            "dest": "caddy:8080"
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "tls",
+        "tlsSettings": {
+          "alpn": ["h2", "http/1.1"],
+	  "fingerprint": "chrome",
+          "certificates": [
+            {
+              "certificateFile": "/caddy_data/caddy/certificates/acme-v02.api.letsencrypt.org-directory/example.com/example.com.crt",
+              "keyFile": "/caddy_data/caddy/certificates/acme-v02.api.letsencrypt.org-directory/example.com/example.com.key"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "outbounds": [
+    {
+      "tag": "direct",
+      "protocol": "freedom"
+    },
+    {
+      "tag": "block",
+      "protocol": "blackhole"
+    }
+  ]
+}

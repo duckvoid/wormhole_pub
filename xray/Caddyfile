@@ -1,0 +1,7 @@
+example.com {
+}
+
+:8080 {
+    root * /srv/stub
+    file_server
+}
