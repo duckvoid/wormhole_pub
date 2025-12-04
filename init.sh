@@ -2,10 +2,37 @@
 
 source settings.conf
 
-# Check if username argument is provided
+# Check if first user provided
 if [ -z "$1" ]; then
-    echo "Usage: $0 username"
+    echo "Usage: $0 user"
     exit 1
+fi
+
+# Path to xray folder
+XRAY_DIR="xray"
+
+# Check if directory exists
+if [ ! -d "$XRAY_DIR" ]; then
+    echo "Directory $XRAY_DIR does not exist!"
+    exit 1
+fi
+
+cd "$XRAY_DIR" || exit 1
+
+# Replace example.com with user domain in config.json
+if [ -f "config.json" ]; then
+    sed -i "s/example\.com/$SERVER_DOMAIN/g" config.json
+    echo "Updated config.json with domain $SERVER_DOMAIN"
+else
+    echo "config.json not found!"
+fi
+
+# Replace example.com with user domain in Caddyfile
+if [ -f "Caddyfile" ]; then
+    sed -i "s/example\.com/$SERVER_DOMAIN/g" Caddyfile
+    echo "Updated Caddyfile with domain $SERVER_DOMAIN"
+else
+    echo "Caddyfile not found!"
 fi
 
 USERNAME="$1"
@@ -34,7 +61,7 @@ cat > "$TMP" <<EOF
             "flow": "$FLOW",
             "level": 0,
             "email": "$EMAIL"
-          },
+          }
 EOF
 
 # Insert the block after the "clients": [ line
@@ -56,9 +83,9 @@ echo "Created file $USER_CONF"
 echo
 qrencode -t ANSIUTF8 "$VLESS_URL"
 
-# Restart docker container xray
-docker restart xray
 
-# Show xray logs
-sleep 3
-docker logs -n 10 xray
+# Start containers
+echo "Start Docker containers..."
+docker-compose up -d
+
+echo "Done!"

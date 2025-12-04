@@ -69,18 +69,6 @@
       "protocol": "vless",
       "settings": {
         "clients": [
-          {
-            "id": "<user1_uuid>",
-            "flow": "xtls-rprx-vision",
-            "level": 0,
-            "email": "user1@example.com"
-          },
-	  {
-            "id": "<user2_uuid>",	
-	    "flow": "xtls-rprx-vision",
-            "level": 0,
-            "email": "user2@example.com"
-          }
         ],
         "decryption": "none",
         "fallbacks": [
