@@ -55,6 +55,7 @@ echo
 qrencode -t ANSIUTF8 "$VLESS_URL"
 
 # Restart docker container xray
+cd $XRAY_DIR
 docker restart xray
 
 # Show xray logs

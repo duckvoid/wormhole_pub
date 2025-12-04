@@ -75,6 +75,7 @@ qrencode -t ANSIUTF8 "$VLESS_URL"
 
 # Start containers
 echo "Start Docker containers..."
+cd $XRAY_DIR
 docker-compose up -d
 
 echo "Done!"
